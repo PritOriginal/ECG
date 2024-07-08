@@ -207,9 +207,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         X = data.iloc[:, 2:]
         y = data['stress']
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=5, stratify=y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=654, stratify=y)
 
-        self.forest = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+        self.forest = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=1)
         self.forest.fit(X_train, y_train)
 
         y_pred_forest = self.forest.predict(X_test)
@@ -218,8 +218,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print("Accuracy:", accuracy_score(y_test, y_pred_forest))
         print(classification_report(y_test, y_pred_forest))
 
-        self.forest = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+        self.forest = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=1)
         self.forest.fit(X, y)
+        print(y[y > 0].count(), y.count())
 
 
 app = QApplication(sys.argv)
