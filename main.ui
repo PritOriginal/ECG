@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>516</width>
-    <height>235</height>
+    <width>1134</width>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -103,35 +103,88 @@
      </widget>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Обработка:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="prepRadBtnNone">
+        <property name="text">
+         <string>None</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="prepRadBtnStandardScaler">
+        <property name="text">
+         <string>StandardScaler</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="prepRadBtnMinMaxScaler">
+        <property name="text">
+         <string>MinMaxScaler</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="prepRadBtnNormalizer">
+        <property name="text">
+         <string>Normalizer</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Точность модели:</string>
+         <string>Модели:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="accuracyModelLb">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>TextLabel</string>
+         <string>test =&gt; prod (recall)</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>test =&gt; prod (recall)</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>test =&gt; prod (recall)</string>
         </property>
-       </spacer>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>test =&gt; prod (recall)</string>
+        </property>
+       </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="modelsGridLayout"/>
     </item>
     <item>
      <spacer name="verticalSpacer">
@@ -153,7 +206,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>516</width>
+     <width>1134</width>
      <height>22</height>
     </rect>
    </property>
