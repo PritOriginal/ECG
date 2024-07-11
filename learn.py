@@ -95,26 +95,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         seed = 42
         modelsList = [
-            # {
-            #     'model': RandomForestClassifier(random_state=seed, n_jobs=-1),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'criterion': ['gini', 'entropy'],
-            #         'n_estimators': [50, 100, 150, 200, 250],
-            #         'max_depth': [None, 10, 20],
-            #         'min_samples_leaf': [1, 2, 4],
-            #     }
-            # },
-            # {
-            #     'model': ExtraTreesClassifier(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'criterion': ['gini', 'entropy'],
-            #         'n_estimators': [50, 100, 150, 200, 250],
-            #         'max_depth': [None, 10, 20],
-            #         'min_samples_leaf': [1, 2, 4],
-            #     }
-            # },
+            {
+                'model': RandomForestClassifier(random_state=seed, n_jobs=-1),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'criterion': ['gini', 'entropy'],
+                    'n_estimators': [50, 100, 150, 200, 250],
+                    'max_depth': [None, 10, 20],
+                    'min_samples_leaf': [1, 2, 4],
+                }
+            },
+            {
+                'model': ExtraTreesClassifier(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'criterion': ['gini', 'entropy'],
+                    'n_estimators': [50, 100, 150, 200, 250],
+                    'max_depth': [None, 10, 20],
+                    'min_samples_leaf': [1, 2, 4],
+                }
+            },
             {
                 'model': DecisionTreeClassifier(),
                 'data': copy.deepcopy(modelDataEmpty),
@@ -124,93 +124,93 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     'min_samples_leaf': [1, 2, 4],
                 }
             },
-            # {
-            #     'model': KNeighborsClassifier(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'n_neighbors': np.arange(1, 51),
-            #         'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
-            #     }
-            # },
-            # {
-            #     'model': MLPClassifier(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'solver': ['lbfgs', 'sgd', 'adam'],
-            #         'max_iter': [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000],
-            #         'alpha': 10.0 ** -np.arange(1, 10),
-            #         # 'hidden_layer_sizes': np.arange(10, 15),
-            #     }
-            # },
-            # {
-            #     'model': BaggingClassifier(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'bootstrap': [True, False],
-            #         'bootstrap_features': [True, False],
-            #         'n_estimators': [5, 10, 15, 100, 200, 300],
-            #         'max_samples': [0.6, 0.8, 1.0],
-            #         'max_features': [0.6, 0.8, 1.0],
-            #         # 'base_estimator__bootstrap': [True, False],
-            #         # 'base_estimator__n_estimators': [100, 200, 300],
-            #         # 'base_estimator__max_features': [0.6, 0.8, 1.0]
-            #     }
-            # },
-            # {
-            #     'model': AdaBoostClassifier(algorithm='SAMME'),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'n_estimators': [50, 100, 200],
-            #         'learning_rate': [0.1, 0.5, 1],
-            #     }
-            # },
-            # {
-            #     'model': GradientBoostingClassifier(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         "loss": ["deviance"],
-            #         "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2],
-            #         "min_samples_split": np.linspace(0.1, 0.5, 12),
-            #         "min_samples_leaf": np.linspace(0.1, 0.5, 12),
-            #         "max_depth": [3, 5, 8],
-            #         "max_features": ["log2", "sqrt"],
-            #         "criterion": ["friedman_mse", "mae"],
-            #         "subsample": [0.5, 0.618, 0.8, 0.85, 0.9, 0.95, 1.0],
-            #         "n_estimators": [10, 50, 100],
-            #     }
-            # },
-            # {
-            #     'model': LogisticRegression(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
-            #         'penalty': ['none', 'elasticnet', 'l1', 'l2'],
-            #         'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
-            #     }
-            # },
-            # {
-            #     'model': LinearSVC(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'penalty': ['l1', 'l2'],
-            #         'C': 0.01 * 10 ** np.arange(0, 5),
-            #     }
-            # },
-            # {
-            #     'model': SVC(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
-            #         'C': 0.01 * 10 ** np.arange(0, 5),
-            #     }
-            # },
-            # {
-            #     'model': GaussianNB(),
-            #     'data': copy.deepcopy(modelDataEmpty),
-            #     'params': {
-            #         'var_smoothing': np.logspace(0, -9, num=100),
-            #     }
-            # },
+            {
+                'model': KNeighborsClassifier(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'n_neighbors': np.arange(1, 51),
+                    'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
+                }
+            },
+            {
+                'model': MLPClassifier(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'solver': ['lbfgs', 'sgd', 'adam'],
+                    'max_iter': [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000],
+                    'alpha': 10.0 ** -np.arange(1, 10),
+                    # 'hidden_layer_sizes': np.arange(10, 15),
+                }
+            },
+            {
+                'model': BaggingClassifier(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'bootstrap': [True, False],
+                    'bootstrap_features': [True, False],
+                    'n_estimators': [5, 10, 15, 100, 200, 300],
+                    'max_samples': [0.6, 0.8, 1.0],
+                    'max_features': [0.6, 0.8, 1.0],
+                    # 'base_estimator__bootstrap': [True, False],
+                    # 'base_estimator__n_estimators': [100, 200, 300],
+                    # 'base_estimator__max_features': [0.6, 0.8, 1.0]
+                }
+            },
+            {
+                'model': AdaBoostClassifier(algorithm='SAMME'),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'n_estimators': [50, 100, 200],
+                    'learning_rate': [0.1, 0.5, 1],
+                }
+            },
+            {
+                'model': GradientBoostingClassifier(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    "loss": ["deviance"],
+                    "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2],
+                    "min_samples_split": np.linspace(0.1, 0.5, 12),
+                    "min_samples_leaf": np.linspace(0.1, 0.5, 12),
+                    "max_depth": [3, 5, 8],
+                    "max_features": ["log2", "sqrt"],
+                    "criterion": ["friedman_mse", "mae"],
+                    "subsample": [0.5, 0.618, 0.8, 0.85, 0.9, 0.95, 1.0],
+                    "n_estimators": [10, 50, 100],
+                }
+            },
+            {
+                'model': LogisticRegression(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
+                    'penalty': ['none', 'elasticnet', 'l1', 'l2'],
+                    'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
+                }
+            },
+            {
+                'model': LinearSVC(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'penalty': ['l1', 'l2'],
+                    'C': 0.01 * 10 ** np.arange(0, 5),
+                }
+            },
+            {
+                'model': SVC(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
+                    'C': 0.01 * 10 ** np.arange(0, 5),
+                }
+            },
+            {
+                'model': GaussianNB(),
+                'data': copy.deepcopy(modelDataEmpty),
+                'params': {
+                    'var_smoothing': np.logspace(0, -9, num=100),
+                }
+            },
         ]
         self.models = [copy.deepcopy(modelsList) for i in range(len(self.preprocessing))]
         self.selectedModelIndex = 0
