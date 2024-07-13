@@ -2,16 +2,43 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>1134</width>
-    <height>271</height>
+    <height>267</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ЭКГ</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow,
+QWidget {
+	background-color: rgb(41, 41, 41);
+}
+QLabel,
+QRadioButton,
+QPushButton {
+	color: #fff
+}
+QPushButton {
+	background-color: rgb(87, 87, 87);
+}
+QPushButton:disabled {
+	
+	background-color: rgb(62, 62, 62);
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -86,21 +113,73 @@
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="learnBtn">
-      <property name="text">
-       <string>Обучить</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <widget class="QPushButton" name="learnBtn">
+        <property name="text">
+         <string>Обучить</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="splitBtn">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Разбить</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="splitBtn">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Разбить</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Версия модели:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radBtnVersionModelTest">
+        <property name="text">
+         <string>Test</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radBtnVersionModelProd">
+        <property name="text">
+         <string>Prod</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radBtnVersionModelAll">
+        <property name="text">
+         <string>Все</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -125,6 +204,13 @@
        <widget class="QRadioButton" name="prepRadBtnStandardScaler">
         <property name="text">
          <string>StandardScaler</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="prepRadBtnRobustScaler">
+        <property name="text">
+         <string>RobustScaler</string>
         </property>
        </widget>
       </item>
@@ -176,6 +262,13 @@
       </item>
       <item>
        <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>test =&gt; prod (recall)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_8">
         <property name="text">
          <string>test =&gt; prod (recall)</string>
         </property>

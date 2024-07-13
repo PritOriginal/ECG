@@ -16,9 +16,9 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, Baggi
     GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler, Normalizer, MinMaxScaler
+from sklearn.preprocessing import StandardScaler, Normalizer, MinMaxScaler, RobustScaler
 from sklearn.svm import SVC, LinearSVC
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import GaussianNB, BernoulliNB, ComplementNB, MultinomialNB, CategoricalNB
 from sklearn.neighbors import KNeighborsClassifier
 
 from sklearn.metrics import (accuracy_score, classification_report, mean_absolute_error, mean_squared_error,
@@ -64,6 +64,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.preprocessing = [
             NonePrep(),
             StandardScaler(),
+            RobustScaler(),
             MinMaxScaler(),
             Normalizer(),
         ]
@@ -71,33 +72,53 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.preprocessingBtbGroup = QButtonGroup()
         self.preprocessingBtbGroup.addButton(self.prepRadBtnNone)
         self.preprocessingBtbGroup.addButton(self.prepRadBtnStandardScaler)
+        self.preprocessingBtbGroup.addButton(self.prepRadBtnRobustScaler)
         self.preprocessingBtbGroup.addButton(self.prepRadBtnMinMaxScaler)
         self.preprocessingBtbGroup.addButton(self.prepRadBtnNormalizer)
         self.preprocessingBtbGroup.idClicked.connect(self.changeSelectedPreprocessing)
+        self.radBtnVersionModelProd.setChecked(True)
 
-        modelDataEmpty = {
-                            'print': '',
-                            'test': {
-                                'best_params': {},
-                                'accuracy': 0,
-                                'confusion_matrix': [],
-                                'recall': 0,
-                                'std': 0,
-                            },
-                            'prod': {
-                                'best_params': {},
-                                'accuracy': 0,
-                                'confusion_matrix': [],
-                                'recall': 0,
-                                'std': 0,
+        self.selectedVersionModelIndex = 0
+        self.versionModelBtnGroup = QButtonGroup()
+        self.versionModelBtnGroup.addButton(self.radBtnVersionModelTest)
+        self.versionModelBtnGroup.addButton(self.radBtnVersionModelProd)
+        self.versionModelBtnGroup.addButton(self.radBtnVersionModelAll)
+        self.versionModelBtnGroup.idClicked.connect(self.changeSelectedVersionModel)
+
+        self.modelVersions = [
+            'test',
+            'prod',
+            'all',
+        ]
+
+        def createModels(model):
+            modelDataEmpty = {
+                                'print': '',
+                                'test': {
+                                    'model': copy.deepcopy(model),
+                                    'best_params': {},
+                                    'accuracy': 0,
+                                    'confusion_matrix': [],
+                                    'recall': 0,
+                                    'std': 0,
+                                },
+                                'prod': {
+                                    'model': copy.deepcopy(model),
+                                    'best_params': {},
+                                    'accuracy': 0,
+                                    'confusion_matrix': [],
+                                    'recall': 0,
+                                    'std': 0,
+                                }
                             }
-                        }
+            return modelDataEmpty
+
 
         seed = 42
+        n_classes = [0, 1, 2]
         modelsList = [
             {
-                'model': RandomForestClassifier(random_state=seed, n_jobs=-1),
-                'data': copy.deepcopy(modelDataEmpty),
+                'models': createModels(RandomForestClassifier(random_state=seed, n_jobs=-1)),
                 'params': {
                     'criterion': ['gini', 'entropy'],
                     'n_estimators': [50, 100, 150, 200, 250],
@@ -106,8 +127,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 }
             },
             {
-                'model': ExtraTreesClassifier(),
-                'data': copy.deepcopy(modelDataEmpty),
+                'models': createModels(ExtraTreesClassifier()),
                 'params': {
                     'criterion': ['gini', 'entropy'],
                     'n_estimators': [50, 100, 150, 200, 250],
@@ -116,8 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 }
             },
             {
-                'model': DecisionTreeClassifier(),
-                'data': copy.deepcopy(modelDataEmpty),
+                'models': createModels(DecisionTreeClassifier()),
                 'params': {
                     'criterion': ['gini', 'entropy'],
                     'max_depth': [None, 10, 20],
@@ -125,92 +144,122 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 }
             },
             {
-                'model': KNeighborsClassifier(),
-                'data': copy.deepcopy(modelDataEmpty),
+                'models': createModels(KNeighborsClassifier(n_neighbors=10)),
                 'params': {
                     'n_neighbors': np.arange(1, 51),
                     'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
                 }
             },
-            {
-                'model': MLPClassifier(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'solver': ['lbfgs', 'sgd', 'adam'],
-                    'max_iter': [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000],
-                    'alpha': 10.0 ** -np.arange(1, 10),
-                    # 'hidden_layer_sizes': np.arange(10, 15),
-                }
-            },
-            {
-                'model': BaggingClassifier(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'bootstrap': [True, False],
-                    'bootstrap_features': [True, False],
-                    'n_estimators': [5, 10, 15, 100, 200, 300],
-                    'max_samples': [0.6, 0.8, 1.0],
-                    'max_features': [0.6, 0.8, 1.0],
-                    # 'base_estimator__bootstrap': [True, False],
-                    # 'base_estimator__n_estimators': [100, 200, 300],
-                    # 'base_estimator__max_features': [0.6, 0.8, 1.0]
-                }
-            },
-            {
-                'model': AdaBoostClassifier(algorithm='SAMME'),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'n_estimators': [50, 100, 200],
-                    'learning_rate': [0.1, 0.5, 1],
-                }
-            },
-            {
-                'model': GradientBoostingClassifier(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    "loss": ["deviance"],
-                    "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2],
-                    "min_samples_split": np.linspace(0.1, 0.5, 12),
-                    "min_samples_leaf": np.linspace(0.1, 0.5, 12),
-                    "max_depth": [3, 5, 8],
-                    "max_features": ["log2", "sqrt"],
-                    "criterion": ["friedman_mse", "mae"],
-                    "subsample": [0.5, 0.618, 0.8, 0.85, 0.9, 0.95, 1.0],
-                    "n_estimators": [10, 50, 100],
-                }
-            },
-            {
-                'model': LogisticRegression(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
-                    'penalty': ['none', 'elasticnet', 'l1', 'l2'],
-                    'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
-                }
-            },
-            {
-                'model': LinearSVC(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'penalty': ['l1', 'l2'],
-                    'C': 0.01 * 10 ** np.arange(0, 5),
-                }
-            },
-            {
-                'model': SVC(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
-                    'C': 0.01 * 10 ** np.arange(0, 5),
-                }
-            },
-            {
-                'model': GaussianNB(),
-                'data': copy.deepcopy(modelDataEmpty),
-                'params': {
-                    'var_smoothing': np.logspace(0, -9, num=100),
-                }
-            },
+            # {
+            #     'models': createModels(MLPClassifier()),
+            #     'params': {
+            #         'solver': ['lbfgs', 'sgd', 'adam'],
+            #         'max_iter': [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000],
+            #         'alpha': 10.0 ** -np.arange(1, 10),
+            #         # 'hidden_layer_sizes': np.arange(10, 15),
+            #     }
+            # },
+            # {
+            #     'models': createModels(BaggingClassifier()),
+            #     'params': {
+            #         'bootstrap': [True, False],
+            #         'bootstrap_features': [True, False],
+            #         'n_estimators': [5, 10, 15, 100, 200, 300],
+            #         'max_samples': [0.6, 0.8, 1.0],
+            #         'max_features': [0.6, 0.8, 1.0],
+            #         # 'base_estimator__bootstrap': [True, False],
+            #         # 'base_estimator__n_estimators': [100, 200, 300],
+            #         # 'base_estimator__max_features': [0.6, 0.8, 1.0]
+            #     }
+            # },
+            # {
+            #     'models': createModels(AdaBoostClassifier(algorithm='SAMME')),
+            #     'params': {
+            #         'n_estimators': [50, 100, 200],
+            #         'learning_rate': [0.1, 0.5, 1],
+            #     }
+            # },
+            # {
+            #     'models': createModels(GradientBoostingClassifier()),
+            #     'params': {
+            #         "loss": ["deviance"],
+            #         "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2],
+            #         "min_samples_split": np.linspace(0.1, 0.5, 12),
+            #         "min_samples_leaf": np.linspace(0.1, 0.5, 12),
+            #         "max_depth": [3, 5, 8],
+            #         "max_features": ["log2", "sqrt"],
+            #         "criterion": ["friedman_mse", "squared_error"],
+            #         "subsample": [0.5, 0.618, 0.8, 0.85, 0.9, 0.95, 1.0],
+            #         "n_estimators": [10, 50, 100],
+            #     }
+            # },
+            # {
+            #     'models': createModels(LogisticRegression()),
+            #     'params': {
+            #         'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
+            #         'penalty': ['none', 'elasticnet', 'l1', 'l2'],
+            #         'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
+            #     }
+            # },
+            # {
+            #     'models': createModels(LinearSVC()),
+            #     'params': {
+            #         'penalty': ['l1', 'l2'],
+            #         'C': 0.01 * 10 ** np.arange(0, 5),
+            #     }
+            # },
+            # {
+            #     'models': createModels(SVC()),
+            #     'params': {
+            #         'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
+            #         'C': 0.01 * 10 ** np.arange(0, 5),
+            #     }
+            # },
+            # {
+            #     'models': createModels(GaussianNB()),
+            #     'params': {
+            #         'var_smoothing': np.logspace(0, -9, num=100),
+            #         # 'priors': [None, [0.1, ] * len(n_classes), ],
+            #     }
+            # },
+            # {
+            #     'models': createModels(BernoulliNB()),
+            #     'params': {
+            #         'alpha': [0.01, 0.1, 0.5, 1.0, 10.0],
+            #         'fit_prior': [True, False],
+            #         # 'class_prior': [None, [0.1, ] * len(n_classes), ],
+            #         'binarize': [None, 0.0, 8.5, 10.0]
+            #     }
+            # },
+            # {
+            #     'model': ComplementNB(),
+            #     'data': copy.deepcopy(modelDataEmpty),
+            #     'params': {
+            #         'alpha': [0.01, 0.1, 0.5, 1.0, 10.0, ],
+            #         'fit_prior': [True, False],
+            #         'norm': [True, False],
+            #         'class_prior': [None, [0.1,]* len(n_classes), ]
+            #     }
+            # },
+            # {
+            #     'model': MultinomialNB(),
+            #     'data': copy.deepcopy(modelDataEmpty),
+            #     'params': {
+            #         'alpha': [0.01, 0.1, 0.5, 1.0, 10.0, ],
+            #         'fit_prior': [True, False],
+            #         'class_prior': [None, [0.1,]* len(n_classes), ]
+            #     }
+            # },
+            # {
+            #     'model': CategoricalNB(min_categories=200),
+            #     'data': copy.deepcopy(modelDataEmpty),
+            #     'params': {
+            #         'alpha': [0.01, 0.1, 0.5, 1.0, 10.0, ],
+            #         'fit_prior': [True, False],
+            #         'min_categories': [18, 25, 30],
+            #         'class_prior': [None, [0.1,]* len(n_classes),]
+            #     }
+            # },
         ]
         self.models = [copy.deepcopy(modelsList) for i in range(len(self.preprocessing))]
         self.selectedModelIndex = 0
@@ -241,10 +290,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             row = 0
             for model_dict in models_list:
                 if column == 0:
-                    radBtn = QRadioButton(model_dict['model'].__class__.__name__)
+                    radBtn = QRadioButton(model_dict['models']['test']['model'].__class__.__name__)
                     self.modelsGridLayout.addWidget(radBtn, row, column)
                     self.modelsBtbGroup.addButton(radBtn)
-                accuracyLabel = QLabel(model_dict['data']['print'])
+                accuracyLabel = QLabel(model_dict['models']['print'])
                 self.modelsGridLayout.addWidget(accuracyLabel, row, column + 1)
                 row += 1
             column += 1
@@ -266,7 +315,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.ecgCurveBtn.setEnabled(True)
             self.heartRateBtn.setEnabled(True)
-            # self.splitBtn.setEnabled(True)
+            self.splitBtn.setEnabled(True)
 
     def readCsv(self):
         self.data = pd.read_csv(self.filePath)
@@ -345,21 +394,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         split_data, split_time = self.splitData()
         split_data = split_data.iloc[:, 2:]
         X = self.preprocessing[self.selectedPreprocessingIndex].transform(split_data)
-        data_pred = self.models[self.selectedPreprocessingIndex][self.selectedModelIndex]['model'].predict(X)
+        data_pred = []
+        if self.modelVersions[self.selectedVersionModelIndex] != 'all':
+            data_pred.append(self.models[self.selectedPreprocessingIndex][self.selectedModelIndex]['models']
+                             [self.modelVersions[self.selectedVersionModelIndex]]['model'].predict(X))
+        else:
+            for version in self.modelVersions:
+                if version != 'all':
+                    data_pred.append(self.models[self.selectedPreprocessingIndex][self.selectedModelIndex]['models']
+                                     [version]['model'].predict(X))
+
+        stress_colors = ['r', 'orange']
 
         fig, ax = plt.subplots()
-        x_start = 0
-        x_end = 0
-        startStress = False;
-        for i in range(len(data_pred)):
-            stress = data_pred[i]
-            if stress == 1 and not startStress:
-                x_start = split_time[i]
-                startStress = True
-            elif stress == 0 and startStress:
-                x_end = split_time[i] - x_start
-                startStress = False
-                ax.add_patch(Rectangle((x_start,40),x_end,110, facecolor='r', alpha=0.2))
+        fig.set_facecolor('#292929')
+        ax.set_facecolor('#575757')
+        ax.xaxis.label.set_color('w')
+        ax.yaxis.label.set_color('w')
+        ax.tick_params(axis='x', colors='w')
+        ax.tick_params(axis='y', colors='w')
+        x_start = [0 for i in range(len(data_pred))]
+        x_end = [0 for i in range(len(data_pred))]
+        stress_type_prev = [0 for i in range(len(data_pred))]
+        height_area = 110
+        y0_area = 40
+        for i in range(len(data_pred[0])):
+            for j in range(len(data_pred)):
+                stress = data_pred[j][i]
+                if stress != stress_type_prev[j] and stress_type_prev[j] != 0:
+                    x_end[j] = split_time[i] - x_start[j]
+                    ax.add_patch(Rectangle((x_start[j], y0_area + height_area / len(data_pred) * j), x_end[j], height_area / len(data_pred), facecolor=stress_colors[j], alpha=stress_type_prev[j] * 0.1))
+                    stress_type_prev[j] = stress
+                    if stress != 0:
+                        x_start[j] = split_time[i]
+
+                elif stress != 0 and stress_type_prev[j] != stress:
+                    x_start[j] = split_time[i]
+                    stress_type_prev[j] = stress
 
         # ax[0].plot(all_time, all_heart_rate_4s, label='Heart Rate 4s Average')
         ax.plot(orig_time, all_heart_rate_4s, label='Heart Rate 4s Average')
@@ -418,7 +489,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print(abs(id) - 2)
         self.selectedPreprocessingIndex = abs(id) - 2
 
-    def learn(self):
+    def changeSelectedVersionModel(self, id):
+        print(abs(id) - 2)
+        self.selectedVersionModelIndex = abs(id) - 2
+
+    # def confusion_matrix_scorer(self, clf, X, y):
+    #     y_pred = clf.predict(X)
+    #     cm = confusion_matrix(y, y_pred)
+    #     recall_0 = cm[0][0] / (cm[0][0] + cm[0][1])
+    #     recall_1 = cm[1][1] / (cm[1][0] + cm[1][1])
+    #     return recall_0 * recall_1
+
+
+    def learn(self, optim=False):
+        def confusion_matrix_scorer(clf, X, y):
+            y_pred = clf.predict(X)
+            cm = confusion_matrix(y, y_pred)
+            recall_0 = cm[0][0] / (cm[0][0] + cm[0][1] + cm[0][2])
+            recall_1 = cm[1][1] / (cm[1][0] + cm[1][1] + cm[1][2])
+            recall_2 = cm[2][1] / (cm[2][0] + cm[2][1] + cm[2][2])
+            return recall_0 * recall_1 * recall_2
         print('Start learn')
         frames = []
         pathlist = Path('data/payload').glob('**/*.csv')
@@ -446,75 +536,81 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             X = prep.transform(X)
 
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seed,
-                                                                stratify=y)
+                                                                stratify=y, shuffle=True)
             models_list = self.models[column]
             row = 0
             for i in range(len(models_list)):
-                model_dict = models_list[i]
-                kfold = KFold(n_splits=num_folds, random_state=seed, shuffle=True)
-                # model = model_dict['model']
-                # model_data = model_dict['data']
-                params = model_dict['params']
+                try:
+                    model_dict = models_list[i]
+                    kfold = KFold(n_splits=num_folds, random_state=seed, shuffle=True)
+                    model_name = model_dict['models']['test']['model'].__class__.__name__
+                    params = model_dict['params']
+                    print(model_name, prep)
 
-                grid_search = GridSearchCV(model_dict['model'], params, cv=kfold, n_jobs=-1, scoring=scoring)
-                grid_search.fit(X_train, y_train)
-                best_params = grid_search.best_params_
-                model_dict['model'] = grid_search.best_estimator_
+                    if optim:
+                        grid_search = GridSearchCV(model_dict['models']['test']['model'], params, cv=kfold, n_jobs=-1, scoring=confusion_matrix_scorer)
+                        grid_search.fit(X_train, y_train)
+                        best_params = grid_search.best_params_
+                        model_dict['models']['test']['model'] = grid_search.best_estimator_
+                        model_dict['models']['test']['best_params'] = best_params
+                        print(best_params)
 
-                cv_results = cross_val_score(model_dict['model'], X_train, y_train, cv=kfold, n_jobs=-1, scoring=scoring)
-                model_dict['model'].fit(X_train, y_train)
-                y_pred = model_dict['model'].predict(X_test)
-                accuracy = model_dict['model'].score(X_test, y_test)
-                print(model_dict['model'].__class__.__name__, prep)
-                print(cv_results.mean())
-                model_dict['data']['test']['best_params'] = best_params
-                model_dict['data']['test']['accuracy'] = accuracy
-                model_dict['data']['test']['recall'] = cv_results.mean()
-                model_dict['data']['test']['std'] = cv_results.std()
-                # print(accuracy)
-                classificationReport = classification_report(y_test, y_pred)
-                # print(classificationReport)
-                matrix = confusion_matrix(y_test, y_pred)
-                model_dict['data']['test']['confusion_matrix'] = matrix
-                print(matrix)
-                recall_0 = matrix[0][0]/(matrix[0][0]+matrix[0][1])
-                recall_1 = matrix[1][1]/(matrix[1][0]+matrix[1][1])
-                # print("MAE", mean_absolute_error(y_test, y_pred))
-                # print("MAPE", mean_absolute_percentage_error(y_test, y_pred))
-                if column == 0:
-                    radBtn = QRadioButton(model_dict['model'].__class__.__name__)
-                    self.modelsGridLayout.addWidget(radBtn, row, column)
-                    self.modelsBtbGroup.addButton(radBtn)
+                    cv_results = cross_val_score(model_dict['models']['test']['model'], X_train, y_train, cv=kfold, n_jobs=-1, scoring=confusion_matrix_scorer)
+                    model_dict['models']['test']['model'].fit(X_train, y_train)
+                    y_pred = model_dict['models']['test']['model'].predict(X_test)
+                    accuracy = model_dict['models']['test']['model'].score(X_test, y_test)
+                    print(cv_results.mean(), cv_results)
+                    model_dict['models']['test']['accuracy'] = accuracy
+                    # model_dict['data']['test']['recall'] = cv_results.mean()
+                    # model_dict['data']['test']['std'] = cv_results.std()
+                    # print(accuracy)
+                    classificationReport = classification_report(y_test, y_pred)
+                    print(classificationReport)
+                    matrix = confusion_matrix(y_test, y_pred)
+                    model_dict['models']['test']['confusion_matrix'] = matrix
+                    recall_0 = matrix[0][0]/(matrix[0][0]+matrix[0][1])
+                    recall_1 = matrix[1][1]/(matrix[1][0]+matrix[1][1])
+                    print(recall_0 * recall_1)
+                    print(matrix)
+                    # print("MAE", mean_absolute_error(y_test, y_pred))
+                    # print("MAPE", mean_absolute_percentage_error(y_test, y_pred))
+                    if column == 0:
+                        radBtn = QRadioButton(model_name)
+                        self.modelsGridLayout.addWidget(radBtn, row, column)
+                        self.modelsBtbGroup.addButton(radBtn)
 
-                grid_search.fit(X, y)
-                best_params = grid_search.best_params_
-                model_dict['model'] = grid_search.best_estimator_
+                    if optim:
+                        grid_search = GridSearchCV(model_dict['models']['prod']['model'], params, cv=kfold, n_jobs=-1, scoring=confusion_matrix_scorer)
+                        grid_search.fit(X, y)
+                        best_params = grid_search.best_params_
+                        model_dict['models']['prod']['model'] = grid_search.best_estimator_
+                        model_dict['models']['prod']['best_params'] = best_params
 
-                cv_results = cross_val_score(model_dict['model'], X, y, cv=kfold, n_jobs=-1, scoring=scoring)
-                model_dict['model'].fit(X, y)
-                y_pred = model_dict['model'].predict(X)
-                accuracy_full = model_dict['model'].score(X, y)
-                # print(accuracy_full)
-                # print(classification_report(y, y_pred))
-                matrix_full = confusion_matrix(y, y_pred)
-                print(matrix_full)
-                recall_full_0 = matrix_full[0][0]/(matrix_full[0][0]+matrix_full[0][1])
-                recall_full_1 = matrix_full[1][1]/(matrix_full[1][0]+matrix_full[1][1])
-                model_dict['data']['print'] = (f'{cv_results.mean():.3f} | {recall_0:.3f} / {recall_1:.3f} => '
-                              f'{recall_full_0 * recall_full_1:.3f} | {recall_full_0:.3f} / {recall_full_1:.3f}')
-                accuracyLabel = QLabel(model_dict['data']['print'])
-                self.modelsGridLayout.addWidget(accuracyLabel, row, column + 1)
+                    # cv_results = cross_val_score(model_dict['model'], X, y, cv=kfold, n_jobs=-1, scoring=scoring)
+                    model_dict['models']['prod']['model'].fit(X, y)
+                    y_pred = model_dict['models']['prod']['model'].predict(X)
+                    accuracy_full = model_dict['models']['prod']['model'].score(X, y)
+                    # print(accuracy_full)
+                    # print(classification_report(y, y_pred))
+                    matrix_full = confusion_matrix(y, y_pred)
+                    print(matrix_full)
+                    recall_full_0 = matrix_full[0][0]/(matrix_full[0][0]+matrix_full[0][1])
+                    recall_full_1 = matrix_full[1][1]/(matrix_full[1][0]+matrix_full[1][1])
+                    model_dict['models']['print'] = (f'{recall_0 * recall_1:.3f} | {recall_0:.3f} / {recall_1:.3f} => '
+                                  f'{recall_full_0 * recall_full_1:.3f} | {recall_full_0:.3f} / {recall_full_1:.3f}')
+                    accuracyLabel = QLabel(model_dict['models']['print'])
+                    self.modelsGridLayout.addWidget(accuracyLabel, row, column + 1)
 
-                model_dict['data']['prod']['best_params'] = best_params
-                model_dict['data']['prod']['accuracy'] = accuracy_full
-                model_dict['data']['prod']['recall'] = cv_results.mean()
-                model_dict['data']['prod']['std'] = cv_results.std()
-                model_dict['data']['prod']['confusion_matrix'] = matrix_full
-
+                    model_dict['models']['prod']['accuracy'] = accuracy_full
+                    # model_dict['models']['prod']['recall'] = cv_results.mean()
+                    # model_dict['models']['prod']['std'] = cv_results.std()
+                    model_dict['models']['prod']['confusion_matrix'] = matrix_full
+                except Exception as e:
+                    print(e)
                 row += 1
             column += 1
 
-        print(self.models)
+        # print(self.models)
         filename = 'models.sav'
         pickle.dump(self.models, open(filename, 'wb'))
 
