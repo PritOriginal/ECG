@@ -109,6 +109,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_6.addWidget(self.splitBtn)
 
+        self.splitAllBtn = QPushButton(self.centralwidget)
+        self.splitAllBtn.setObjectName(u"splitAllBtn")
+        self.splitAllBtn.setEnabled(True)
+
+        self.horizontalLayout_6.addWidget(self.splitAllBtn)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_6)
 
@@ -245,6 +251,7 @@ class Ui_MainWindow(object):
         self.ecgCurveBtn.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0441\u0442\u0440\u043e\u0438\u0442\u044c \u0433\u0440\u0430\u0444\u0438\u043a \u043a\u0440\u0438\u0432\u043e\u0439", None))
         self.learnBtn.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0431\u0443\u0447\u0438\u0442\u044c", None))
         self.splitBtn.setText(QCoreApplication.translate("MainWindow", u"\u0420\u0430\u0437\u0431\u0438\u0442\u044c", None))
+        self.splitAllBtn.setText(QCoreApplication.translate("MainWindow", u"\u0420\u0430\u0437\u0431\u0438\u0442\u044c \u0432\u0441\u0451", None))
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"\u0412\u0435\u0440\u0441\u0438\u044f \u043c\u043e\u0434\u0435\u043b\u0438:", None))
         self.radBtnVersionModelTest.setText(QCoreApplication.translate("MainWindow", u"Test", None))
         self.radBtnVersionModelProd.setText(QCoreApplication.translate("MainWindow", u"Prod", None))
@@ -256,10 +263,10 @@ class Ui_MainWindow(object):
         self.prepRadBtnMinMaxScaler.setText(QCoreApplication.translate("MainWindow", u"MinMaxScaler", None))
         self.prepRadBtnNormalizer.setText(QCoreApplication.translate("MainWindow", u"Normalizer", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u041c\u043e\u0434\u0435\u043b\u0438:", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"test => prod (recall)", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"test => prod (recall)", None))
-        self.label_6.setText(QCoreApplication.translate("MainWindow", u"test => prod (recall)", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"test => prod (recall)", None))
-        self.label_8.setText(QCoreApplication.translate("MainWindow", u"test => prod (recall)", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"test => prod (f1_macro)", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"test => prod (f1_macro)", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"test => prod (f1_macro)", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"test => prod (f1_macro)", None))
+        self.label_8.setText(QCoreApplication.translate("MainWindow", u"test => prod (f1_macro)", None))
     # retranslateUi
 

@@ -131,6 +131,16 @@ QPushButton:disabled {
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="splitAllBtn">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Разбить всё</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -242,35 +252,35 @@ QPushButton:disabled {
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>test =&gt; prod (recall)</string>
+         <string>test =&gt; prod (f1_macro)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>test =&gt; prod (recall)</string>
+         <string>test =&gt; prod (f1_macro)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>test =&gt; prod (recall)</string>
+         <string>test =&gt; prod (f1_macro)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>test =&gt; prod (recall)</string>
+         <string>test =&gt; prod (f1_macro)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>test =&gt; prod (recall)</string>
+         <string>test =&gt; prod (f1_macro)</string>
         </property>
        </widget>
       </item>
